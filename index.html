@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Movie Website</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: black;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .movie-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .image-container {
+      width: 300px;
+      margin: 10px;
+      padding: 10px;
+      background-color: #080907;
+      
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .text-container {
+      width: 500px;
+      margin: 10px;
+      padding: 10px;
+      background-color: #080907;
+       color: #ece9e9;
+      border-radius: 5px;
+    }
+
+    .text-container h2 {
+      font-size: 18px;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+
+    .text-container p {
+      margin-bottom: 5px;
+    }
+  </style>
+  <script>
+    // Function to fetch movie details from OMDb API
+    function fetchMovieDetails(movieId) {
+      const apiKey = "496286aa";  
+      const detailsUrl = `https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}`;
+      const ratingsUrl = `https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}&plot=short&r=json`;
+      const castUrl = `https://www.omdbapi.com/?i=${movieId}&apikey=${apiKey}&plot=short&cast=full`;
+
+      // Fetch details
+      $.ajax({
+        url: detailsUrl,
+        type: "GET",
+        dataType: "json",
+        success: function(detailsResponse) {
+          // Fetch ratings
+          $.ajax({
+            url: ratingsUrl,
+            type: "GET",
+            dataType: "json",
+            success: function(ratingsResponse) {
+              // Fetch cast
+              $.ajax({
+                url: castUrl,
+                type: "GET",
+                dataType: "json",
+                success: function(castResponse) {
+                  displayMovieDetails(detailsResponse, ratingsResponse, castResponse);
+                },
+                error: function(error) {
+                  console.log("Error fetching cast:", error);
+                }
+              });
+            },
+            error: function(error) {
+              console.log("Error fetching ratings:", error);
+            }
+          });
+        },
+        error: function(error) {
+          console.log("Error fetching movie details:", error);
+        }
+      });
+    }
+
+    // Function to display movie details on the webpage
+    function displayMovieDetails(details, ratings, cast) {
+      const title = details.Title;
+      const year = details.Year;
+      const poster = details.Poster;
+      const plot = details.Plot;
+      const genre = details.Genre;
+      const imdbRating = details.imdbRating;
+      const director = details.Director;
+      const writer = details.Writer;
+      const actors = cast.Actors;
+      const language = details.Language;
+      const country = details.Country;
+      const awards = details.Awards;
+      const ratingsArray = ratings.Ratings;
+
+      const ratingsList = ratingsArray.map(function(rating) {
+        return `<li>${rating.Source}: ${rating.Value}</li>`;
+      }).join("");
+
+      const movieDetails = `
+        <div class="movie-details">
+          <div class="row">
+            
+          <div class="image-container col">
+            <img src="${poster}" alt="${title}">
+          </div>
+          <div class="text-container col">
+            <h2> <strong>${title}</strong></h2>
+            <p><strong>Year:</strong> ${year}</p>
+            <p><strong>Genre:</strong> ${genre}</p>
+            <p><strong>IMDb Rating:</strong> ${imdbRating}</p>
+            <p><strong>Director:</strong> ${director}</p>
+            <p><strong>Writer:</strong> ${writer}</p>
+            <p><strong>Actors:</strong> ${actors}</p>
+            <p><strong>Language:</strong> ${language}</p>
+            <p><strong>Country:</strong> ${country}</p>
+            <p><strong>Awards:</strong> ${awards}</p>
+            <h3>Ratings:</h3>
+            <ul>${ratingsList}</ul>
+            <p><strong>Plot:</strong> ${plot}</p>
+          </div>
+          </div>
+        </div>
+      `;
+
+      $(".movie-container").append(movieDetails);
+    }
+
+    $(document).ready(function() {
+      // Fetch movie details for a specific movie ID
+      const movieId = "tt3896198"; // Example movie ID (Guardians of the Galaxy Vol. 2)
+      fetchMovieDetails(movieId);
+    });
+  </script>
+</head>
+<body>
+  <div class="container mt-4">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title"><strong>Movie</strong></h1>
+        <p class="card-text">A movie website that focuses on the movie "Guardians of the Galaxy Vol. 2". This highly anticipated sequel, directed by James Gunn, continues the intergalactic adventures of the Guardians of the Galaxy team led by Peter Quill (Star-Lord). The website fetches movie details from the OMDb API, displaying comprehensive information including the title, year, genre, IMDb rating, director, writer, actors, language, country, awards, ratings, and plot summary. With its captivating storyline, stellar cast, and positive reception, "Guardians of the Galaxy Vol. 2" has solidified its place as a beloved addition to the Marvel Cinematic Universe, offering audiences an exciting blend of action, humor, and heartfelt moments.</p>
+      </div>
+    </div>
+  </div>
+   
+  <div class="movie-container mt-4"></div>
+  <script src="js/bootstrap.min.js"></script> 
+</body>
+</html>
